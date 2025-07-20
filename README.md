@@ -27,7 +27,7 @@ The goal of this project is to address the critical business problem of employee
 
 ## 4. Project Structure
 ```
-/your-project-folder
+/Employee_Attrition_Analysis_Prediction
 ├── Model
 ├── Pictures
 ├── app.py
