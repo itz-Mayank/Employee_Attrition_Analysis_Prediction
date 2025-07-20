@@ -5,7 +5,6 @@ This project features an interactive web application built with Streamlit for an
 ## Dashboard Preview
 ![Dashboard Preview](Pictures/1.png)
 ![Dashboard Preview](Pictures/2.png)
-*(**Action Needed:** Replace the URL above with a link to a screenshot of your running dashboard.)*
 
 ---
 
@@ -45,8 +44,8 @@ Follow these steps to set up and run the project locally.
 
 ### **Step 1: Clone the Repository**
 ```bash
-git clone https://github.com/your-username/your-repository-name.git
-cd your-repository-name
+git clone (https://github.com/itz-Mayank/Employee_Attrition_Analysis_Prediction)
+cd Employee_Attrition_Analysis_Prediction
 ```
 
 ### **Step 2: Create and Activate a Virtual Environment**
@@ -63,7 +62,7 @@ python -m venv venv
 
 ### **Step 3: Install Dependencies**
 ```bash
-pip install -r requirements.txt
+pip install -r Requirements.txt
 ```
 
 ## 6. Usage
