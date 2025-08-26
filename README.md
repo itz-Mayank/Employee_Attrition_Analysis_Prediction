@@ -93,10 +93,10 @@ The selected Logistic Regression model achieved the following performance on the
 
 | Metric     | Score | Interpretation                                                |
 |------------|-------|--------------------------------------------------------------|
-| Accuracy   | 90%   | Overall, the model correctly classifies 90% of all employees.|
-| Precision  | 79%   | When the model predicts an employee will leave, it is correct 79% of the time.|
-| Recall     | 53%   | The model successfully identifies 53% of all employees who actually leave.|
-| F1-Score   | 63%   | The model achieves a healthy balance between Precision and Recall.|
+| Accuracy   | 91%   | Overall, the model correctly classifies 91% of all employees.|
+| Precision  | 84%   | When the model predicts an employee will leave, it is correct 84% of the time.|
+| Recall     | 55%   | The model successfully identifies 55% of all employees who actually leave.|
+| F1-Score   | 67%   | The model achieves a healthy balance between Precision and Recall.|
 
 This represents a strong, practical model. It significantly reduces the number of "false alarms" (low precision) while still identifying over half of all at-risk employees.
 
