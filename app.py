@@ -2,50 +2,63 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import os
 import plotly.express as px
 
-# --- Page Config ---
+# Page Config
 st.set_page_config(
     page_title="HR Analytics Dashboard",
-    page_icon="📊",
     layout="wide",
 )
 
-# --- Load Data ---
+# File Paths
+BASE_PATH = r"C:/Users/Mayank Meghwal/Desktop/DS GUVI/Projects/Employee/new_model"
+RAW_FILE = os.path.join(BASE_PATH, "Employee.csv")
+MODEL_FILE = os.path.join(BASE_PATH, "Employee.pkl")
+SCALER_FILE = os.path.join(BASE_PATH, "scaler.pkl")
+FEATURES_FILE = os.path.join(BASE_PATH, "features.pkl")
+
+# Load Data
 @st.cache_data
 def load_data():
-    df_raw = pd.read_csv("C:/Users/Mayank Meghwal/Desktop/DS GUVI/Projects/Employee/Employee.csv")
+    df_raw = pd.read_csv(RAW_FILE)
     df_raw.dropna(inplace=True)
     return df_raw
 
 @st.cache_resource
-def load_pipeline():
+def load_model_and_scaler():
     try:
-        pipeline = joblib.load("C:/Users/Mayank Meghwal/Desktop/DS GUVI/Projects/Employee/Model/Employee.pkl")
-        return pipeline
+        model = joblib.load(MODEL_FILE)
+        scaler = joblib.load(SCALER_FILE)
+        return model, scaler
     except FileNotFoundError:
-        st.error("Pipeline file not found.")
-        return None
+        st.error("Model or scaler file not found. Please retrain.")
+        return None, None
 
 @st.cache_data
-def get_model_features():
-    df_processed = pd.read_csv("C:/Users/Mayank Meghwal/Desktop/DS GUVI/Projects/Employee/Preprocessed.csv")
-    return df_processed.drop(columns=["Attrition_Yes"]).columns
+def load_features():
+    try:
+        features = joblib.load(FEATURES_FILE)
+        return features
+    except Exception as e:
+        st.error(f"Error loading feature columns: {e}")
+        return []
 
-# --- Load Assets ---
+# Load Assets
 df = load_data()
-pipeline = load_pipeline()
-model_features = get_model_features()
+model, scaler = load_model_and_scaler()
+model_features = load_features()
 
 # --- Sidebar Navigation ---
 st.sidebar.title("Navigation")
 section = st.sidebar.radio("Go to", ["Executive Dashboard", "Attrition Prediction"])
 
-# --- Executive Dashboard ---
+
+# Executive Dashboard
 if section == "Executive Dashboard":
     st.title("Executive Dashboard: Attrition Insights")
 
-    # Metrics
+    # Top KPIs
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Employees", len(df))
     col2.metric("Attrition Rate", f"{df['Attrition'].value_counts(normalize=True)['Yes']:.2%}")
@@ -56,63 +69,69 @@ if section == "Executive Dashboard":
     # Attrition by Department
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Attrition by Department")
         dept_attrition = df.groupby("Department")["Attrition"].apply(lambda x: (x == "Yes").mean()).reset_index()
         dept_attrition.columns = ["Department", "Attrition Rate"]
-        fig = px.bar(dept_attrition, x="Department", y="Attrition Rate", text=dept_attrition["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        fig = px.bar(dept_attrition, x="Department", y="Attrition Rate",
+                     text=dept_attrition["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        st.subheader("Attrition by Department")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        st.subheader("Monthly Income vs. Attrition")
         fig = px.box(df, x="Attrition", y="MonthlyIncome", color="Attrition", notched=True)
+        st.subheader("Monthly Income vs Attrition")
         st.plotly_chart(fig, use_container_width=True)
 
     # Overtime & Job Satisfaction
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Attrition Rate by Overtime")
         over_attr = df.groupby("OverTime")["Attrition"].apply(lambda x: (x == "Yes").mean()).reset_index(name="Attrition Rate")
-        fig = px.bar(over_attr, x="OverTime", y="Attrition Rate", text=over_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        fig = px.bar(over_attr, x="OverTime", y="Attrition Rate",
+                     text=over_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        st.subheader("⏱ Attrition Rate by Overtime")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        st.subheader("Job Satisfaction & Attrition")
         job_attr = df.groupby("JobSatisfaction")["Attrition"].apply(lambda x: (x == "Yes").mean()).reset_index(name="Attrition Rate")
-        fig = px.bar(job_attr, x="JobSatisfaction", y="Attrition Rate", text=job_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        fig = px.bar(job_attr, x="JobSatisfaction", y="Attrition Rate",
+                     text=job_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        st.subheader("Job Satisfaction vs Attrition")
         st.plotly_chart(fig, use_container_width=True)
 
-    # Work-Life Balance & Role
+    # Work-Life Balance & Job Role
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Work-Life Balance vs Attrition")
         wlb = df.groupby("WorkLifeBalance")["Attrition"].apply(lambda x: (x == "Yes").mean()).reset_index(name="Attrition Rate")
-        fig = px.bar(wlb, x="WorkLifeBalance", y="Attrition Rate", text=wlb["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        fig = px.bar(wlb, x="WorkLifeBalance", y="Attrition Rate",
+                     text=wlb["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        st.subheader("Work-Life Balance vs Attrition")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        st.subheader("Distribution by Job Role")
         fig = px.pie(df, names="JobRole", title="Job Role Distribution", hole=0.3)
+        st.subheader("Job Role Distribution")
         st.plotly_chart(fig, use_container_width=True)
 
     # Age & Gender
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Age Distribution")
         fig = px.histogram(df, x="Age", color="Attrition", marginal="box")
+        st.subheader("Age Distribution by Attrition")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        st.subheader("Gender-wise Attrition")
         gen_attr = df.groupby("Gender")["Attrition"].apply(lambda x: (x == "Yes").mean()).reset_index(name="Attrition Rate")
-        fig = px.bar(gen_attr, x="Gender", y="Attrition Rate", text=gen_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        fig = px.bar(gen_attr, x="Gender", y="Attrition Rate",
+                     text=gen_attr["Attrition Rate"].apply(lambda x: f"{x:.2%}"))
+        st.subheader("Gender-wise Attrition")
         st.plotly_chart(fig, use_container_width=True)
 
-# --- Attrition Prediction ---
+
+# Attrition Prediction
 elif section == "Attrition Prediction":
     st.title("Attrition Prediction")
-
-    if pipeline:
-        st.markdown("Fill in the employee details to predict whether they are likely to leave.")
+    
+    if model is not None and scaler is not None and len(model_features) > 0:
+        st.markdown("### Fill in employee details to predict whether they are likely to leave.")
 
         with st.form("predict_form"):
             col1, col2, col3 = st.columns(3)
@@ -134,13 +153,13 @@ elif section == "Attrition Prediction":
             submitted = st.form_submit_button("Predict")
 
         if submitted:
-            # Get mode/median-based template for default values
+            # Default values using mode/median
             base = {}
             for col in df.columns:
                 if col != "Attrition":
                     base[col] = df[col].mode()[0] if df[col].dtype == "object" else df[col].median()
 
-            # Update with user inputs
+            # Update with user input
             base.update({
                 "Age": age,
                 "OverTime": overtime,
@@ -153,33 +172,29 @@ elif section == "Attrition Prediction":
                 "YearsAtCompany": years_company,
             })
 
-            # Convert to DataFrame
             input_df = pd.DataFrame([base])
-
-            # One-hot encode to match training
             input_encoded = pd.get_dummies(input_df)
-
-            # Reindex to match training columns
             input_final = input_encoded.reindex(columns=model_features, fill_value=0)
 
-            # Get prediction and probabilities
-            prediction = pipeline.predict(input_final)[0]
-            probas = pipeline.predict_proba(input_final)[0]
+            # Apply Scaler
+            input_scaled = scaler.transform(input_final)
 
-            # Extract individual class probabilities
-            prob_stay = probas[0] * 100
-            prob_leave = probas[1] * 100
+            # Prediction
+            probas = model.predict_proba(input_scaled)[0]
+            prediction = np.argmax(probas)
 
-            # Display Results
+            prob_stay, prob_leave = probas[0] * 100, probas[1] * 100
+
+            # Results
             st.subheader("Prediction Result")
-
             if prediction == 1:
-                st.error(f"Prediction: Employee is **likely to leave**")
+                st.error("Employee is **likely to leave**")
             else:
-                st.success(f"Prediction: Employee is **likely to stay**")
+                st.success("Employee is **likely to stay**")
 
-            st.info(f"Confidence Scores:\n- Stay: **{prob_stay:.2f}%**\n- Leave: **{prob_leave:.2f}%**")
-
-            # Show full input summary
+            # Input Summary
             with st.expander("Input Summary"):
                 st.json(base)
+
+    else:
+        st.warning("Model, scaler, or features not loaded. Please retrain or check file paths.")
