@@ -28,15 +28,15 @@ The goal of this project is to address the critical business problem of employee
 ## 4. Project Structure
 ```
 /Employee_Attrition_Analysis_Prediction
-├── Model
-├── Pictures
+├── Models/
+├── Pictures/
 ├── app.py
-├── Employee.ipynb                        
 ├── Employee.csv
-├── Model.py
-├── Logistic_Model.py            
-├── Preprocessed.csv             
-└── README.md                  
+├── Employee.ipynb
+├── Model.ipynb
+├── Preprocessed.csv
+└── README.md
+└── Requirement.csv
 ```
 
 ## 5. Setup & Installation
@@ -86,17 +86,17 @@ The model was trained on a historical employee dataset. Key steps in data prepar
 - **Balancing**: Addressing the class imbalance (fewer employees leave than stay) using techniques like class_weight to ensure the model learns effectively from the minority class.
 
 ### 7.3. Modeling & Evaluation
-Several classification algorithms were tested, including Logistic Regression, Decision Tree, and Random Forest. Models were evaluated based on their F1-Score, Precision, and Recall, with a strong focus on the model's ability to correctly identify employees who will leave (the positive class). After extensive experimentation, a Logistic Regression model provided the best and most balanced performance.
+Several classification algorithms were tested, including Logistic Regression, Decision Tree, and Random Forest. Models were evaluated based on their F1-Score, Precision, and Recall, with a strong focus on the model's ability to correctly identify employees who will leave (the positive class). After extensive experimentation, a Random Forest model provided the best and most balanced performance.
 
 ### 7.4. Final Model Performance
-The selected Logistic Regression model achieved the following performance on the test set:
+The selected Random Forest model achieved the following performance on the test set:
 
 | Metric     | Score | Interpretation                                                |
 |------------|-------|--------------------------------------------------------------|
 | Accuracy   | 91%   | Overall, the model correctly classifies 91% of all employees.|
-| Precision  | 84%   | When the model predicts an employee will leave, it is correct 84% of the time.|
-| Recall     | 55%   | The model successfully identifies 55% of all employees who actually leave.|
-| F1-Score   | 67%   | The model achieves a healthy balance between Precision and Recall.|
+| Precision  | 92%   | When the model predicts an employee will leave, it is correct 92% of the time.|
+| Recall     | 91%   | The model successfully identifies 91% of all employees who actually leave.|
+| F1-Score   | 91%   | The model achieves a healthy balance between Precision and Recall.|
 
 This represents a strong, practical model. It significantly reduces the number of "false alarms" (low precision) while still identifying over half of all at-risk employees.
 
@@ -105,12 +105,9 @@ The confusion matrix provides a detailed breakdown of the model's predictions ve
 
 |                 | Predicted: Stays | Predicted: Leaves |
 |-----------------|------------------|--------------------|
-| **Actual: Stays**   | 312 (True Negative) | 8 (False Positive)  |
-| **Actual: Leaves**  | 26 (False Negative) | 22 (True Positive)   |
+| **Actual: Stays**   | 228 (True Negative) | 19 (False Positive)  |
+| **Actual: Leaves**  | 23 (False Negative) | 224 (True Positive)   |
 
-- **True Positives (2)**: The model correctly identified 22 employees who were going to leave.
-- **False Positives (8)**: The model incorrectly flagged 8 employees as leaving, but they stayed.
-- **False Negatives (26)**: The model missed 26 employees who left.
 
 ### 7.6. Key Insights from the Dashboard
 The interactive visualizations on the dashboard revealed several key drivers of attrition:
